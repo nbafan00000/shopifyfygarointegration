@@ -50,7 +50,10 @@ app.get('/pay', async (req, res) => {
 
         const order = await shopify.order.create(orderPayload);
 
-        const amount = order.total_price; // Or calculate manually
+        let amount = order.total_price; // Or calculate manually
+        if (parseFloat(amount) < 200) {
+            amount = (parseFloat(amount) + 15).toString();
+        }
         const currency = order.currency; // e.g., 'USD'
         const customReference = order.name; // Use order name for tracking
 
@@ -176,14 +179,22 @@ app.post('/webhook', async (req, res) => {
             throw new Error('Order is not in pending status');
         }
 
-        const expectedAmount = (order.total_price < 200) ? order.total_price + 15 : order.total_price; // Or 
+        let expectedAmount = order.total_price; // Or remaining pending amount
+        if (parseFloat(expectedAmount) < 200) {
+            expectedAmount = (parseFloat(expectedAmount) + 15).toString();
+        }
+        const expectedCurrency = order.currency;
+
+        if (payload.amount !== expectedAmount || payload.currency !== expectedCurrency) {
+            throw new Error('Amount or currency mismatch');
+        }
 
         // Create transaction to mark as paid
         // For pending payments, create a 'sale' transaction
         const transaction = await shopify.transaction.create(orderId, {
             kind: 'sale',
             status: 'success',
-            amount: expectedAmount,
+            amount: payload.amount,
             currency: payload.currency,
             gateway: 'fygaro',
             source: 'external',
