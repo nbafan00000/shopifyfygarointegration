@@ -16,7 +16,7 @@ var order = null;
 
 // Endpoint to generate Fygaro payment link and redirect
 app.get('/pay', async (req, res) => {
-    const { customer_id, variant_id, quantity, line_items } = req.query;
+    const { customer_id, variant_id, quantity, line_items, first_name, last_name, address1, city, zip, country, phone } = req.query;
     const shopify = new Shopify({
         shopName: process.env.SHOPIFY_STORE_URL,
         accessToken: process.env.SHOPIFY_API_TOKEN
@@ -39,6 +39,10 @@ app.get('/pay', async (req, res) => {
                 quantity: parseInt(quantity),
             }];
         }
+
+        orderPayload.shipping_address = {
+            first_name, last_name, address1, city, zip, country, phone
+        };
 
         // Add customer association if ID provided
         const parsedCustomerId = parseInt(customer_id);
