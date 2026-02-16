@@ -15,9 +15,10 @@ app.use(express.json());
 import { RedisSessionStorage } from '@shopify/shopify-app-session-storage-redis';
 import Redis from 'ioredis';
 
-const redisClient = new Redis(process.env.REDIS_URL);
+import { MemorySessionStorage } from '@shopify/shopify-app-session-storage-memory';
 
-const sessionStorage = new RedisSessionStorage(redisClient);
+const sessionStorage = new MemorySessionStorage();
+
 
 /* -------------------------------
    Shopify App Initialization
