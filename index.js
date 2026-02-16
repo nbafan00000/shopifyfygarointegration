@@ -351,8 +351,11 @@ async function getRestClient(shop) {
 
 app.get('/pay', async (req, res) => {
     try {
+        console.log("step1");
         const { shop } = req.query;
+        console.log('step2');
         const client = await getRestClient(shop);
+        console.log('step3');
 
         const {
             email,
@@ -412,8 +415,10 @@ app.get('/pay', async (req, res) => {
             data: orderPayload,
             type: 'application/json',
         });
+        console.log('step4');
 
         const order = response.body.order;
+        console.log('step5');
 
         let amount = order.total_price;
         if (parseFloat(amount) < 200) {
@@ -435,6 +440,7 @@ app.get('/pay', async (req, res) => {
                 },
             }
         );
+        console.log('step6');
 
         const paymentUrl = `${process.env.FYGARO_BUTTON_URL}?jwt=${token}`;
 
