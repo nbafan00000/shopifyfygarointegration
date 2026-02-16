@@ -15,9 +15,21 @@ app.use(express.json());
 import { RedisSessionStorage } from '@shopify/shopify-app-session-storage-redis';
 import Redis from 'ioredis';
 
-import { MemorySessionStorage } from '@shopify/shopify-app-session-storage-memory';
+let redisClient;
 
-const sessionStorage = new MemorySessionStorage();
+function getRedisClient() {
+    if (!redisClient) {
+        redisClient = new Redis(process.env.REDIS_URL, {
+            tls: {},                  // Required for rediss://
+            maxRetriesPerRequest: 0,  // Prevent retry loops
+            enableReadyCheck: false,  // Prevent blocking
+            lazyConnect: true,        // Do NOT connect on cold start
+        });
+    }
+    return redisClient;
+}
+
+const sessionStorage = new RedisSessionStorage(getRedisClient());
 
 
 /* -------------------------------
