@@ -12,6 +12,13 @@ import '@shopify/shopify-api/adapters/node';
 const app = express();
 app.use(express.json());
 
+import { RedisSessionStorage } from '@shopify/shopify-app-session-storage-redis';
+import Redis from 'ioredis';
+
+const redisClient = new Redis(process.env.REDIS_URL);
+
+const sessionStorage = new RedisSessionStorage(redisClient);
+
 /* -------------------------------
    Shopify App Initialization
 -------------------------------- */
@@ -23,15 +30,8 @@ const shopify = shopifyApi({
     hostName: process.env.HOST.replace(/^https?:\/\//, ''),
     apiVersion: ApiVersion.January26,
     isEmbeddedApp: false,
+    sessionStorage,
 });
-
-
-import { RedisSessionStorage } from '@shopify/shopify-app-session-storage-redis';
-import Redis from 'ioredis';
-
-const redisClient = new Redis(process.env.REDIS_URL);
-
-const sessionStorage = new RedisSessionStorage(redisClient);
 
 
 /* -------------------------------
@@ -61,8 +61,6 @@ app.get('/auth/callback', async (req, res) => {
         rawRequest: req,
         rawResponse: res,
     });
-
-    await storeSession(callback.session);
 
     res.send('App successfully installed 🎉');
 });
