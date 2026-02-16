@@ -20,16 +20,17 @@ let redisClient;
 function getRedisClient() {
     if (!redisClient) {
         redisClient = new Redis(process.env.REDIS_URL, {
-            tls: {},                  // Required for rediss://
-            maxRetriesPerRequest: 0,  // Prevent retry loops
-            enableReadyCheck: false,  // Prevent blocking
-            lazyConnect: true,        // Do NOT connect on cold start
+            tls: {},
+            maxRetriesPerRequest: 0,
+            enableReadyCheck: false,
+            lazyConnect: true,  // connect only on first request
         });
     }
     return redisClient;
 }
 
 const sessionStorage = new RedisSessionStorage(getRedisClient());
+
 
 
 /* -------------------------------
