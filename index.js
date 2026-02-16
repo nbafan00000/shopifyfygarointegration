@@ -20,16 +20,14 @@ let redisClient;
 function getRedisClient() {
     if (!redisClient) {
         redisClient = new Redis(process.env.REDIS_URL, {
-            maxRetriesPerRequest: null,
-            enableReadyCheck: true,
-            tls: process.env.REDIS_URL.startsWith("rediss://")
-                ? {}
-                : undefined,
+            tls: {},
+            maxRetriesPerRequest: 0,
+            enableReadyCheck: false,
+            lazyConnect: true,  // connect only on first request
         });
     }
     return redisClient;
 }
-
 
 const sessionStorage = new RedisSessionStorage(getRedisClient());
 
@@ -73,13 +71,25 @@ app.get('/auth', async (req, res) => {
 -------------------------------- */
 
 app.get('/auth/callback', async (req, res) => {
-    const callback = await shopify.auth.callback({
-        rawRequest: req,
-        rawResponse: res,
-    });
+    try {
+        const callback = await shopify.auth.callback({
+            rawRequest: req,
+            rawResponse: res,
+        });
 
-    res.send('App successfully installed 🎉');
+        const session = callback.session;
+
+        console.log("SHOP:", session.shop);
+        console.log("ACCESS TOKEN:", session.accessToken);
+        console.log("IS ONLINE:", session.isOnline);
+
+        res.send('App successfully installed 🎉');
+    } catch (error) {
+        console.error("OAuth error:", error);
+        res.status(500).send("OAuth failed");
+    }
 });
+
 
 /* -------------------------------
    Helper: Get Authenticated Client
