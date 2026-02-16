@@ -80,6 +80,10 @@ async function getRestClient(shop) {
     return new shopify.clients.Rest({ session });
 }
 
+app.get('/', (req, res) => {
+    res.send('Backend Running!');
+})
+
 /* -------------------------------
    PAYMENT ROUTE (/pay)
 -------------------------------- */
@@ -267,10 +271,4 @@ app.post('/webhook', async (req, res) => {
     }
 });
 
-/* -------------------------------
-   START SERVER
--------------------------------- */
-
-app.listen(process.env.PORT, () =>
-    console.log(`🚀 Server running on port ${process.env.PORT}`)
-);
+export default app;
