@@ -85,14 +85,17 @@ app.get('/auth/callback', async (req, res) => {
 
 async function getRestClient(shop) {
     const sessionId = shopify.session.getOfflineId(shop);
-    const session = await shopify.sessionStorage.loadSession(sessionId);
+
+    // IMPORTANT: use the sessionStorage variable you created
+    const session = await sessionStorage.loadSession(sessionId);
 
     if (!session) {
-        throw new Error('Shop not authenticated');
+        throw new Error(`Shop ${shop} not authenticated`);
     }
 
     return new shopify.clients.Rest({ session });
 }
+
 
 app.get('/', (req, res) => {
     res.send('Backend Running!');
