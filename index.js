@@ -20,14 +20,16 @@ let redisClient;
 function getRedisClient() {
     if (!redisClient) {
         redisClient = new Redis(process.env.REDIS_URL, {
-            tls: {},
-            maxRetriesPerRequest: 0,
-            enableReadyCheck: false,
-            lazyConnect: true,  // connect only on first request
+            maxRetriesPerRequest: null,
+            enableReadyCheck: true,
+            tls: process.env.REDIS_URL.startsWith("rediss://")
+                ? {}
+                : undefined,
         });
     }
     return redisClient;
 }
+
 
 const sessionStorage = new RedisSessionStorage(getRedisClient());
 
