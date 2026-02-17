@@ -5,7 +5,7 @@ import Shopify from 'shopify-api-node';
 import jwt from 'jsonwebtoken';
 
 // Shopify API (v12+ is ESM only)
-import { shopifyApi, ApiVersion, LATEST_API_VERSION } from '@shopify/shopify-api';
+import { shopifyApi, ApiVersion } from '@shopify/shopify-api';
 import '@shopify/shopify-api/adapters/node'; // registers the Node adapter
 
 
